@@ -29,6 +29,7 @@ class PlayerClient
 end
 
 begin
+  start_time = Time.now
   DRb.start_service
 
   player_server = File.expand_path("../player_server.rb", __FILE__)
@@ -39,51 +40,47 @@ begin
     path = ARGV[i]
     port = PORT + i
     secret = Digest::SHA1.hexdigest("#{Time.now}#{rand}#{i}")
-    system %{ruby #{player_server} "#{path}" #{port} #{secret} &}
+    cmd = %{bundle exec ruby #{player_server} "#{path}" #{port} #{secret} &}
+    puts cmd
+    system cmd
     Battleship::Util.wait_for_socket('0.0.0.0', port)
     players << PlayerClient.new(secret, DRbObject.new(nil, "druby://0.0.0.0:#{port}"))
   end
 
   winners = []
 
-  3.times do |i|
+  starting_time = Time.now - start_time
+
+  start_time = Time.now
+
+  1.times do |i|
     stderr = ""
     $stderr = StringIO.new(stderr)
 
     game = Battleship::Game.new(10, [2, 3, 3, 4, 5], *players)
-    renderer = Battleship::DeluxeConsoleRenderer.new
-    $stdout << renderer.render(game)
-    $stdout << stderr
-
-    until game.winner
-      t0 = Time.now
+    50.times do
       game.tick
-      time_taken = Time.now - t0
-      $stdout << renderer.render(game)
-      $stdout << stderr
-      sleep [DELAY - time_taken, 0].max
+      $stdout << "."
     end
-
-    puts "", "#{game.winner.name} won round #{i+1}!"
-
-    winners << game.winner.name
-
-    sleep 3
-
-    break if i == 1 && winners[0] == winners[1]
-
-    players.reverse!
+    $stdout << "\n"
   end
+
+  time_taken = Time.now - start_time
 
   puts
   winners.each_with_index do |name, i|
     puts "Round #{i+1}. #{name}"
   end
 
+  puts "START TIME: #{starting_time}"
+  puts "TIME TAKEN: #{time_taken}"
+
   players.each &:kill
 
 rescue Exception => e
   $stderr = STDERR
+  puts e.inspect
+  puts e.backtrace
   raise e
 ensure
   players.each &:kill

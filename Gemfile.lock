@@ -8,6 +8,7 @@ GEM
     parallel (0.5.9)
 
 PLATFORMS
+  java
   ruby
 
 DEPENDENCIES

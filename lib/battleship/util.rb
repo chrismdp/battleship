@@ -32,7 +32,7 @@ module Battleship
       end
     else
       def wait_for_socket(*args)
-        sleep 1
+        sleep 60
       end
     end
 

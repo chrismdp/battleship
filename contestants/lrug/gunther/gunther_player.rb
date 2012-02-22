@@ -1,5 +1,7 @@
 require 'set'
 
+srand(1000)
+
 class GuntherPlayer
   def name
     "Gunther"

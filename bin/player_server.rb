@@ -9,7 +9,7 @@ module Battleship
     extend Forwardable
 
     def initialize
-      @player_class = find_player_classes.first
+      @player_class = GuntherPlayer
       @player = @player_class.new
     end
 
