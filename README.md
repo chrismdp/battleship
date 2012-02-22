@@ -1,6 +1,34 @@
 Battleship
 ==========
 
+Benchmark mode
+--------------
+
+This fork converts battleship to a benchmark mode of operation to test different rubies.
+
+To test a different ruby (jruby in this example), run:
+
+    rvm install jruby
+    rvm use jruby@battleship
+    bundle
+    # export any options you might need
+    time bundle exec ruby bin/play.rb contestants/lrug/gunther/gunther_player.rb{,}
+
+Different rubies environment variables
+--------------------------------------
+
+In testing I found that jruby requires these options:
+
+    JRUBY_OPTS='--1.9 --server -J-Xmx1024m'
+
+And rubinius requires these options:
+
+    RBXOPT=-X19 rbx -v
+
+The slides for my initial results are here:
+
+http://speakerdeck.com/u/chrismdp/p/the-great-ruby-showdown
+
 The game
 --------
 
